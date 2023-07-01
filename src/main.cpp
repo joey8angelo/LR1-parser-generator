@@ -1,8 +1,16 @@
 #include "../headers/headers.h"
+#include "../headers/Grammar.h"
+#include "../headers/State.h"
+#include "../headers/StateMachine.h"
 
 int main(){
     Grammar grammar;
+
     getGrammar(grammar);
+    makeFIRST(grammar);
+
+    StateMachine sm(&grammar);
+    sm.printStates();
     return 0;
 }
 
@@ -76,6 +84,43 @@ void getGrammar(Grammar& grammar){
         for(int j = 0; j < grammar.rules[i].size(); j++){
             if(grammar.nonTerminals.find(grammar.rules[i][j]) == grammar.nonTerminals.end())
                 grammar.terminals.insert(grammar.rules[i][j]);
+        }
+    }
+}
+
+void makeFIRST(Grammar& grammar){
+    for (auto a = grammar.terminals.begin(); a != grammar.terminals.end(); a++){
+        if(grammar._FIRST.find(*a) == grammar._FIRST.end()){
+            grammar._FIRST[*a] = unordered_set<string>({*a});
+        }
+    }
+    for (auto A = grammar.nonTerminals.begin(); A != grammar.nonTerminals.end(); A++){
+        grammar._FIRST[*A] = unordered_set<string>();
+    }
+
+    bool firstChanged = true;
+
+    while (firstChanged) {
+        firstChanged = false;
+
+        for (int i = 0; i < grammar.rules.size(); i++){
+            bool cont = true;
+            unordered_set<string> rhs;
+            for (int j = 1; j < grammar.rules[i].size() && cont; j++){
+                string B = grammar.rules[i][j];
+                for (auto n = grammar._FIRST[B].begin(); n != grammar._FIRST[B].end(); n++){
+                    if (*n != "%" || j == grammar.rules[i].size()-1)
+                        rhs.insert(*n);
+                }
+                if (grammar._FIRST[B].find("%") == grammar._FIRST[B].end())
+                    cont = false;
+            }
+            for (auto r = rhs.begin(); r != rhs.end(); r++){
+                if (grammar._FIRST[grammar.rules[i][0]].find(*r) == grammar._FIRST[grammar.rules[i][0]].end())
+                    firstChanged = true;
+                grammar._FIRST[grammar.rules[i][0]].insert(*r);
+            }
+            rhs.clear();
         }
     }
 }

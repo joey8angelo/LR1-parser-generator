@@ -6,14 +6,12 @@
 #include <string>
 #include <fstream>
 #include <math.h>
+#include <tuple>
+#include <bits/stdc++.h>
 
-using std::vector, std::string, std::pair, std::unordered_set, std::unordered_map, std::cout, std::endl;
+using std::vector, std::string, std::pair, std::unordered_set, std::unordered_map, std::cout, std::endl, std::make_tuple, std::tuple, std::get;
 
-struct Grammar {
-    vector<vector<string>> rules;
-    unordered_set<string> nonTerminals;
-    unordered_set<string> terminals;
-    unordered_map<string, unordered_set<string>> FIRST;
-};
+class Grammar;
 
 void getGrammar(Grammar&);
+void makeFIRST(Grammar&);
