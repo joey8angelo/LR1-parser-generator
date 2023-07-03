@@ -10,12 +10,12 @@ class StateMachine{
 
     void printStates();
     string stringSet(unordered_set<string>&);
+    vector<State*> getStates();
 
     private:
 
-    State* makeState(vector<tuple<int,int,unordered_set<string>>>);
+    int makeState(vector<tuple<int,int,unordered_set<string>>>);
 
-    State* start;
     vector<State*> states;
     Grammar* grammar;
 };

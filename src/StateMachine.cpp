@@ -2,21 +2,22 @@
 #include "../headers/Grammar.h"
 #include "../headers/headers.h"
 
-StateMachine::StateMachine(Grammar* grammar) : start(nullptr), grammar(grammar) {
-    this->start = makeState({make_tuple(0,1,unordered_set<string>({"$"}))});
+StateMachine::StateMachine(Grammar* grammar) : grammar(grammar) {
+    makeState({make_tuple(0,1,unordered_set<string>({"$"}))});
 }
 
-State* StateMachine::makeState(vector<tuple<int,int,unordered_set<string>>> k){
+int StateMachine::makeState(vector<tuple<int,int,unordered_set<string>>> k){
     State* state = new State(k);
 
     // if state exists already return it
     for(int i = 0; i < this->states.size(); i++){
         if(*state == *this->states[i]){
             delete state;
-            return this->states[i];
+            return i;
         }
     }
 
+    int pos = this->states.size();
     // if state does not exist add it to the list of existing states
     this->states.push_back(state);
 
@@ -27,7 +28,7 @@ State* StateMachine::makeState(vector<tuple<int,int,unordered_set<string>>> k){
         state->transitions[i->first] = makeState(i->second);
     }
 
-    return state;
+    return pos;
 }
 
 void StateMachine::printStates(){
@@ -73,7 +74,7 @@ void StateMachine::printStates(){
         cout << "    Transitions:" << endl;
         for(auto j = this->states[i]->transitions.begin(); j != this->states[i]->transitions.end(); j++){
             cout << "        " << j->first << " -> ";
-            State* state = j->second;
+            State* state = this->states[j->second];
             for(int x = 0; x < this->states.size(); x++){
                 if(state == this->states[x]){
                     cout << "State " << x << endl;
@@ -93,4 +94,8 @@ string StateMachine::stringSet(unordered_set<string>& set){
         res += ", " + *i;
     }
     return res;
+}
+
+vector<State*> StateMachine::getStates(){
+    return this->states;
 }

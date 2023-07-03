@@ -7,5 +7,7 @@ class Grammar {
     vector<vector<string>> rules;
     unordered_set<string> nonTerminals;
     unordered_set<string> terminals;
+    unordered_map<string, int> IDS;
     unordered_map<string, unordered_set<string>> _FIRST;
+    string start;
 };

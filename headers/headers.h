@@ -9,9 +9,11 @@
 #include <tuple>
 #include <bits/stdc++.h>
 
-using std::vector, std::string, std::pair, std::unordered_set, std::unordered_map, std::cout, std::endl, std::make_tuple, std::tuple, std::get;
+using std::vector, std::string, std::pair, std::unordered_set, std::unordered_map, std::cout, std::endl, std::make_tuple, std::make_pair, std::tuple, std::get;
 
 class Grammar;
+class State;
 
-void getGrammar(Grammar&);
+bool getGrammar(Grammar&);
 void makeFIRST(Grammar&);
+bool makeTable(vector<vector<pair<char,int>>>&, vector<State*>&, Grammar&);

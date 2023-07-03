@@ -47,6 +47,8 @@ unordered_map<string, vector<tuple<int,int,unordered_set<string>>>> State::makeT
 
         // each item in closed
         for(auto i = this->closed.begin(); i != this->closed.end(); i++){
+            if(grammar->rules[i->first].size() == 1)
+                continue;
             string first = grammar->rules[i->first][1];
 
             // if the dotted position in the rule is nonTerm
