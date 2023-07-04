@@ -16,8 +16,11 @@ int main(){
     vector<vector<pair<char,int>>> table;
     vector<State*> states = sm.getStates();
     if(!makeTable(table, states, grammar))
-        return 1;
+        return 2;
     // parse inputs
+    if(!parse(table, grammar))
+        return 3;
+    
     return 0;
 }
 
@@ -29,7 +32,7 @@ bool getGrammar(Grammar& grammar){
     int ID = 0;
     bool ret = true;
 
-    file.open("../input.txt");
+    file.open("../grammarInput.txt");
 
     if(!file.is_open())
         return false;
@@ -177,6 +180,13 @@ bool makeTable(vector<vector<pair<char,int>>>& table, vector<State*>& states, Gr
             else
                 table[i][grammar.IDS[j->first]] = make_pair('S', j->second);
         }
+        for(auto j = states[i]->closed.begin(); j != states[i]->closed.end(); j++){
+            if(grammar.rules[j->first].size() == 1){
+                for(auto x = j->second.begin(); x != j->second.end(); x++){
+                    table[i][grammar.IDS[*x]] = make_pair('R', j->first);
+                }
+            }
+        }
         for(int j = 0; j < states[i]->kernel.size(); j++){
             tuple<int,int,unordered_set<string>> k = states[i]->kernel[j];
             if(grammar.rules[get<0>(k)].size() == get<1>(k)){
@@ -191,10 +201,70 @@ bool makeTable(vector<vector<pair<char,int>>>& table, vector<State*>& states, Gr
                                 " while attempting to reduce rule " << get<0>(k) << endl;
                         ret = false;
                     }
+                    if(table[i][grammar.IDS[*x]].first == 'A')
+                        continue;
                     table[i][grammar.IDS[*x]] = make_pair('R', get<0>(k));
                 }
             }
         }
     }
     return ret;
+}
+
+bool parse(vector<vector<pair<char, int>>>& table, Grammar& grammar){
+    vector<string> stack = {"$", "0"};
+    std::ifstream file;
+    file.open("../input.txt");
+
+    if(!file.is_open())
+        return false;
+
+    string input;
+
+    if (!(file >> input))
+        input = "$";
+
+    while(true){
+        int state = atoi(stack[stack.size()-1].c_str());
+
+        if(grammar.terminals.find(input) == grammar.terminals.end() && input != "$"){
+            cout << "token not in grammar" << endl;
+            return false;
+        }
+
+        pair<char, int> t = table[state][grammar.IDS[input]];
+        if(t.first == 'R'){
+            if(grammar.rules[t.second].size() != 1){
+                int p = grammar.rules[t.second].size()-1;
+                while(p > 0){
+                    if(stack[stack.size()-1] == grammar.rules[t.second][p])
+                        p--;
+                    stack.pop_back();
+                }
+            }
+
+            state = atoi(stack[stack.size()-1].c_str());
+
+            stack.push_back(grammar.rules[t.second][0]);
+
+            stack.push_back(std::to_string(table[state][grammar.IDS[stack[stack.size()-1]]].second));
+        }
+        else if(t.first == 'S'){
+            stack.push_back(input);
+
+            stack.push_back(std::to_string(t.second));
+
+            if (!(file >> input))
+                input = "$";
+        }
+        else if(t.first == 'A'){
+            cout << "Accept";
+            break;
+        }
+        else{
+            cout << "error";
+            return false;
+        }
+    }
+    return true;
 }
