@@ -71,12 +71,15 @@ unordered_map<string, vector<tuple<int,int,unordered_set<string>>>> State::makeT
                     }
                 }
             }
-            if(1 < grammar->rules[i->first].size() && !closedChanged){
-                if(transitions.find(grammar->rules[i->first][1]) == transitions.end())
-                    transitions[grammar->rules[i->first][1]] = {make_tuple(i->first, 2, i->second)};
-                else
-                    transitions[grammar->rules[i->first][1]].push_back(make_tuple(i->first, 2, i->second));
-            }
+        }
+    }
+
+    for(auto i = closed.begin(); i != closed.end(); i++){
+        if(1 < grammar->rules[i->first].size()){
+            if(transitions.find(grammar->rules[i->first][1]) == transitions.end())
+                transitions[grammar->rules[i->first][1]] = {make_tuple(i->first, 2, i->second)};
+            else
+                transitions[grammar->rules[i->first][1]].push_back(make_tuple(i->first, 2, i->second));
         }
     }
 

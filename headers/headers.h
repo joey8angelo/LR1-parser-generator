@@ -17,4 +17,4 @@ class State;
 bool getGrammar(Grammar&);
 void makeFIRST(Grammar&);
 bool makeTable(vector<vector<pair<char,int>>>&, vector<State*>&, Grammar&);
-bool parse(vector<vector<pair<char,int>>>&, Grammar&);
+bool parse(vector<vector<pair<char,int>>>&, Grammar&, vector<State*>&);

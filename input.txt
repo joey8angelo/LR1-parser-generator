@@ -1,1 +1,12 @@
-( ( ) )
+func ident ( ident : int , ident : int ) : int {
+    ident : int = num + ( num * ident / ( num + num ) ) ;
+    ident : int ;
+    if ( [ num == num + ident and num == ident ] or num == num ) { 
+        if ( ident >= num + ( ident * num ) ) { 
+            statement ;
+        }
+    } 
+    else { 
+        statement ;
+    }
+}

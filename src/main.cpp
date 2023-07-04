@@ -18,7 +18,7 @@ int main(){
     if(!makeTable(table, states, grammar))
         return 2;
     // parse inputs
-    if(!parse(table, grammar))
+    if(!parse(table, grammar, states))
         return 3;
     
     return 0;
@@ -211,7 +211,7 @@ bool makeTable(vector<vector<pair<char,int>>>& table, vector<State*>& states, Gr
     return ret;
 }
 
-bool parse(vector<vector<pair<char, int>>>& table, Grammar& grammar){
+bool parse(vector<vector<pair<char, int>>>& table, Grammar& grammar, vector<State*>& states){
     vector<string> stack = {"$", "0"};
     std::ifstream file;
     file.open("../input.txt");
@@ -228,7 +228,7 @@ bool parse(vector<vector<pair<char, int>>>& table, Grammar& grammar){
         int state = atoi(stack[stack.size()-1].c_str());
 
         if(grammar.terminals.find(input) == grammar.terminals.end() && input != "$"){
-            cout << "token not in grammar" << endl;
+            cout << "token '" << input << "' not in grammar" << endl;
             return false;
         }
 
@@ -262,7 +262,36 @@ bool parse(vector<vector<pair<char, int>>>& table, Grammar& grammar){
             break;
         }
         else{
-            cout << "error";
+            cout << "SYNTAX ERROR in state " << state << " expecting ";
+            unordered_set<string> expects;
+            // expects lookaheads for any rule that reduces
+            for(int i = 0; i < states[state]->kernel.size(); i++){
+                if(grammar.rules[get<0>(states[state]->kernel[i])].size() == get<1>(states[state]->kernel[i])){
+                    for(auto j = get<2>(states[state]->kernel[i]).begin(); j != get<2>(states[state]->kernel[i]).end(); j++){
+                        expects.insert(*j);
+                    }
+                }
+            }
+            for(auto i = states[state]->closed.begin(); i != states[state]->closed.end(); i++){
+                if(grammar.rules[i->first].size() == 1){
+                    for(auto j = i->second.begin(); j != i->second.end(); j++){
+                        expects.insert(*j);
+                    }
+                }
+            }
+            // or any transition that is terminal
+            for(auto i = states[state]->transitions.begin(); i != states[state]->transitions.end(); i++){
+                if(grammar.terminals.find(i->first) != grammar.terminals.end())
+                    expects.insert(i->first);
+            }
+
+            auto p = expects.begin();
+            cout << *p;
+            p++;
+            for(; p != expects.end(); p++){
+                cout << " or " << *p;
+            }
+            cout << ", not " << input << "." << endl;
             return false;
         }
     }
