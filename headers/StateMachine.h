@@ -6,7 +6,11 @@ class StateMachine{
     public:
 
     StateMachine(Grammar*);
-    ~StateMachine(){}
+    ~StateMachine(){
+        for(int i = 0; i < this->states.size(); i++){
+            delete this->states[i];
+        }
+    }
 
     void printStates();
     string stringSet(unordered_set<string>&);
