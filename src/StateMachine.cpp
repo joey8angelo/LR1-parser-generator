@@ -54,10 +54,6 @@ void StateMachine::printStates(){
         // print closures
         cout << "    ----------------" << endl;
         for(auto j = this->states[i]->closed.begin(); j != this->states[i]->closed.end(); j++){
-            int first = j->first;
-            int second = 1;
-            unordered_set<string> third = j->second;
-
             cout << "    " << this->grammar->rules[j->first][0] << " >";
             for(int x = 1; x < this->grammar->rules[j->first].size(); x++){
                 cout << " ";
@@ -65,7 +61,7 @@ void StateMachine::printStates(){
                     cout << ".";
                 cout << this->grammar->rules[j->first][x];
             }
-            if(second == this->grammar->rules[first].size())
+            if(1 == this->grammar->rules[j->first].size())
                 cout << " .";
             cout << " , {" << this->stringSet(j->second) << "}" << endl;
         }
