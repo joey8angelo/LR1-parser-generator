@@ -169,8 +169,8 @@ bool makeTable(vector<vector<pair<char,int>>>& table, vector<State*>& states, Gr
             table[table.size()-1].push_back(make_pair('-',0));
         }
     }
-    auto n = states[0]->transitions;
-    auto m = n[grammar.start];
+    // auto n = states[0]->transitions;
+    // auto m = n[grammar.start];
     table[states[0]->transitions[grammar.start]][grammar.IDS["$"]] = make_pair('A', 0);
 
     for(int i = 0; i < states.size(); i++){
@@ -183,6 +183,18 @@ bool makeTable(vector<vector<pair<char,int>>>& table, vector<State*>& states, Gr
         for(auto j = states[i]->closed.begin(); j != states[i]->closed.end(); j++){
             if(grammar.rules[j->first].size() == 1){
                 for(auto x = j->second.begin(); x != j->second.end(); x++){
+                    if(table[i][grammar.IDS[*x]].first == 'S'){
+                        cout << "SHIFT/REDUCE CONFLICT in state " << i << " on " << *x << 
+                                " while attempting to reduce rule " << j->first << endl;
+                        ret = false;
+                    }
+                    else if(table[i][grammar.IDS[*x]].first == 'R'){
+                        cout << "REDUCE/REDUCE CONFLICT in state " << i << " on " << *x <<
+                                " while attempting to reduce rule " << j->first << endl;
+                        ret = false;
+                    }
+                    else if(table[i][grammar.IDS[*x]].first == 'A')
+                        continue;
                     table[i][grammar.IDS[*x]] = make_pair('R', j->first);
                 }
             }
@@ -201,7 +213,7 @@ bool makeTable(vector<vector<pair<char,int>>>& table, vector<State*>& states, Gr
                                 " while attempting to reduce rule " << get<0>(k) << endl;
                         ret = false;
                     }
-                    if(table[i][grammar.IDS[*x]].first == 'A')
+                    else if(table[i][grammar.IDS[*x]].first == 'A')
                         continue;
                     table[i][grammar.IDS[*x]] = make_pair('R', get<0>(k));
                 }
